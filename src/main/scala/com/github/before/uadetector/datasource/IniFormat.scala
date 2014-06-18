@@ -22,6 +22,7 @@ import scala.collection.mutable.ArrayBuffer
 import scala.util.Failure
 import scala.util.Success
 import scala.util.Try
+
 import com.github.before.uadetector.datasource.regex.Converter
 import com.github.before.uadetector.datasource.regex.Pattern
 
@@ -36,7 +37,9 @@ object IniFormat {
   /** Determines the type of a given line in string representation. */
   object Line {
     def apply(line: String): Line = {
-      if (Comment.classify(line))
+      if (Version.classify(line))
+        Version.parse(line).get
+      else if (Comment.classify(line))
         Comment.parse(line).get
       else if (Section.classify(line))
         Section.parse(line).get
@@ -449,6 +452,8 @@ object IniFormat {
               acc
           case u: Unknown =>
             append(acc, u, s)
+          case v: Version =>
+            append(acc, v, s)
         }
         go(accumulated, lines.tail, section)
       }
@@ -500,10 +505,30 @@ object IniFormat {
           case u: Unknown =>
             buf.append(u)
             entries.tail
+          case v: Version =>
+            buf.append(v)
+            entries.tail
         }
       }
       buf.toVector
     } else Vector()
+  }
+
+  case class Version(value: String) extends Line with DataVersion
+
+  /** The prefix `; Version:` indicate the version of `Data`. */
+  object Version {
+    val prefix = "; Version:"
+    def classify(line: String): Boolean =
+      if (line.nonEmpty)
+        line startsWith prefix
+      else
+        false
+    def parse(line: String): Option[Version] =
+      if (classify(line))
+        Some(Version(line.substring(prefix.length).trim))
+      else
+        None
   }
 
 }

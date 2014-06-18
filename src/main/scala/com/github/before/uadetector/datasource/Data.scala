@@ -25,6 +25,7 @@ import com.github.before.uadetector.datasource.IniFormat.Properties
 import com.github.before.uadetector.datasource.IniFormat.Property
 import com.github.before.uadetector.datasource.IniFormat.Section
 import com.github.before.uadetector.datasource.IniFormat.Unknown
+import com.github.before.uadetector.datasource.IniFormat.Version
 
 import scalaz.stream.Process.Process1
 import scalaz.stream.Process.await1
@@ -88,6 +89,8 @@ object Data {
             emit(acc) fby go(acc, section)
           case u: Unknown =>
             go(append(u, s, acc), s)
+          case v: Version =>
+            go(append(v, s, acc), s)
         }
       } orElse emit(acc)
     }

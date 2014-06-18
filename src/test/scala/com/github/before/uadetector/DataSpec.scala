@@ -17,6 +17,7 @@ import com.github.before.uadetector.datasource.IniFormat.OperatingSystemRegexs
 import com.github.before.uadetector.datasource.IniFormat.OperatingSystems
 import com.github.before.uadetector.datasource.IniFormat.Properties
 import com.github.before.uadetector.datasource.IniFormat.Robots
+import com.github.before.uadetector.datasource.IniFormat.Global
 import net.sf.uadetector.datastore.SimpleXmlDataStore
 import scalaz.stream.io
 import com.github.before.uadetector.datasource.Entry
@@ -83,6 +84,10 @@ class DataSpec extends Specification {
     "read the same amount of robots" in {
       newDataStructure.getOrElse(Robots, Vector()) filter properties must beEmpty
       newDataStructure.getOrElse(Robots, Vector()).filterNot(comments(_)).size must be equalTo (previousDataStructure.getRobots.size)
+    }
+    "read the same version" in {
+      import com.github.before.uadetector.datasource.IniFormat.Version
+      newDataStructure.getOrElse(Global, Vector()).filterNot(comments(_)) must contain(Version(previousDataStructure.getVersion))
     }
   }
 
