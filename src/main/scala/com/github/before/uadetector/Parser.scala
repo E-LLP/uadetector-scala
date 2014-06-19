@@ -18,12 +18,11 @@ package com.github.before.uadetector
 import scala.collection.immutable.Vector
 
 import com.github.before.uadetector.datasource.Browser
-import com.github.before.uadetector.datasource.Browser
 import com.github.before.uadetector.datasource.BrowserId
 import com.github.before.uadetector.datasource.BrowserRegex
 import com.github.before.uadetector.datasource.BrowserToOperatingSystem
 import com.github.before.uadetector.datasource.Data
-import com.github.before.uadetector.datasource.Device
+import com.github.before.uadetector.datasource.DataVersion
 import com.github.before.uadetector.datasource.Device
 import com.github.before.uadetector.datasource.DeviceId
 import com.github.before.uadetector.datasource.DeviceRegex
@@ -33,6 +32,7 @@ import com.github.before.uadetector.datasource.IniFormat.BrowserTypes
 import com.github.before.uadetector.datasource.IniFormat.Browsers
 import com.github.before.uadetector.datasource.IniFormat.DeviceRegexs
 import com.github.before.uadetector.datasource.IniFormat.Devices
+import com.github.before.uadetector.datasource.IniFormat.Global
 import com.github.before.uadetector.datasource.IniFormat.OperatingSystemRegexs
 import com.github.before.uadetector.datasource.IniFormat.OperatingSystems
 import com.github.before.uadetector.datasource.IniFormat.Robots
@@ -40,6 +40,7 @@ import com.github.before.uadetector.datasource.IniFormat.Section
 import com.github.before.uadetector.datasource.OperatingSystemId
 import com.github.before.uadetector.datasource.OperatingSystemRegex
 import com.github.before.uadetector.datasource.Robot
+import com.github.before.uadetector.datasource.UnknownDataVersion
 
 class Parser(val data: Data) {
 
@@ -80,6 +81,10 @@ class Parser(val data: Data) {
     }
 
   val robots = Parser.filterBySectionAndType(data, Robots, classOf[Robot])
+
+  lazy val version: DataVersion = Parser.filterBySectionAndType(data, Global, classOf[DataVersion])
+    .headOption
+    .getOrElse(UnknownDataVersion)
 
   private[uadetector] def browser(uaString: String): Option[(Browser, Option[Version])] = for {
     browserIdAndVersion <- browserId(uaString)

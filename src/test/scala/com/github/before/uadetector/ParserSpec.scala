@@ -33,6 +33,17 @@ import ExampleLoader._
 
 class ParserSpec extends Specification {
 
+  "A parser" should {
+    "hold an unknown data version if the given data does not provide a version" in {
+      new Parser(Map()).version must be equalTo UnknownDataVersion
+      new Parser(Map(Global -> Vector())).version must be equalTo UnknownDataVersion
+    }
+    "hold the data version of the given data source" in {
+      val version = datasource.IniFormat.Version("20140619-01")
+      new Parser(Map(Global -> Vector(version))).version must be equalTo version
+    }
+  }
+
   val version = "20140609-03"
   val deviceExamplesFile = s"uaDEVICE_example_${version}.csv"
   val osExamplesFile = s"uasOS_example_${version}.csv"
